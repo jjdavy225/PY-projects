@@ -56,6 +56,11 @@ def sumMin(matrix:list):
         print(line)
     return sumM,mat
 
+def getKey(townListIndex, value):
+  for key, val in townListIndex.items():
+    if val == value:
+      return key
+
 def regret(matrix:list, townListIndex):
     mat = copy.deepcopy(matrix)
     regretList = []
@@ -69,32 +74,41 @@ def regret(matrix:list, townListIndex):
                 line = mat[i].copy()
                 line.remove(mat[i][j])
                 line = [x for x in line if x != '.']
-                minLine = min(line)
+                if len(line) > 0 : minLine = min(line)
+                else : minLine = 0
                 col = [mat[a][j] for a in range(len(matrix))]
                 col.remove(mat[i][j])
                 col = [x for x in col if x!='.']
-                minCol = min(col)
-                depart = townListIndex[0][i]
-                arrivee = townListIndex[1][j]
+                if len(col) > 0 : minCol = min(col)
+                else : minCol = 0
+                depart = getKey(townListIndex[0],i)
+                arrivee = getKey(townListIndex[1],j)
                 print(f"{depart}{arrivee}")
                 regretList.append([depart,arrivee,minLine+minCol])
     max = 0
+    print(regretList)
     for element in regretList:
         if element[2] > max:
             regretMax = element
             max = regretMax[2]
-    mat[regretMax[1]][regretMax[0]] = '.'
-    col = regretMax[1]
-    line = regretMax[0]
+    print(regretMax)
+    line = townListIndex[0][regretMax[0]]
+    col = townListIndex[1][regretMax[1]]
+    townListIndex[0][regretMax[0]] = '.'
+    townListIndex[1][regretMax[1]] = '.'
     for i in range(len(mat[line])):
         mat[line][i] = '.'
     for i in range(len(mat)):
         mat[i][col] = '.'
+    tempLine = townListIndex[0][regretMax[1]]
+    tempCol = townListIndex[1][regretMax[0]]
+    if isinstance(tempLine,int) and isinstance(tempCol,int):
+        mat[tempLine][tempCol] = '.'
     print('-----------mat réduite--------------')
     for line in mat:
         print(line)
             
-    return regretMax,mat
+    return regretMax,mat,townListIndex
     
 def little(matrix : list,townListIndex, val = 0):
     sumM,newMat = sumMin(matrix)
@@ -118,8 +132,8 @@ def little(matrix : list,townListIndex, val = 0):
 townName = ['B','L','N','P','M','D']
 townListIndex = [{},{}]
 for index in range(len(matrix)):
-    townListIndex[0][index] = townName[index]
-    townListIndex[1][index] = townName[index]
+    townListIndex[0][townName[index]] = index
+    townListIndex[1][townName[index]] = index
     
 print(townListIndex)
          
